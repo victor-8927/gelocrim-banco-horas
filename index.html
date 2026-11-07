@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Escala Banco de Horas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* === TOKENS === */
+:root {
+  --bg: #f7f8fa;
+  --bg-card: #ffffff;
+  --bg-header: #0f1923;
+  --fg: #1a2332;
+  --fg-muted: #64748b;
+  --fg-light: #94a3b8;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --orange: #ea580c;
+  --orange-light: #fff7ed;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --teal: #0891b2;
+  --teal-light: #ecfeff;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-header: #010409;
+    --fg: #e6edf3;
+    --fg-muted: #8b949e;
+    --fg-light: #6e7681;
+    --border: #21262d;
+    --accent: #58a6ff;
+    --accent-light: #0d2149;
+    --green: #3fb950;
+    --green-light: #0d2318;
+    --amber: #d29922;
+    --amber-light: #2a1f00;
+    --red: #f85149;
+    --red-light: #2a0d0d;
+    --orange: #f0883e;
+    --orange-light: #2a1500;
+    --purple: #a371f7;
+    --purple-light: #1a0d35;
+    --teal: #39d0d8;
+    --teal-light: #001f28;
+    --shadow: 0 1px 3px rgba(0,0,0,.3);
+    --shadow-md: 0 4px 6px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117;
+  --bg-card: #161b22;
+  --bg-header: #010409;
+  --fg: #e6edf3;
+  --fg-muted: #8b949e;
+  --fg-light: #6e7681;
+  --border: #21262d;
+  --accent: #58a6ff;
+  --accent-light: #0d2149;
+  --green: #3fb950;
+  --green-light: #0d2318;
+  --amber: #d29922;
+  --amber-light: #2a1f00;
+  --red: #f85149;
+  --red-light: #2a0d0d;
+  --orange: #f0883e;
+  --orange-light: #2a1500;
+  --purple: #a371f7;
+  --purple-light: #1a0d35;
+  --teal: #39d0d8;
+  --teal-light: #001f28;
+  --shadow: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+
+/* === HEADER === */
+.header {
+  background: var(--bg-header);
+  color: #fff;
+  margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: 20px max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.header h1 { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
+.header-sub { margin: 4px 0 0; font-size: .8rem; color: rgba(255,255,255,.55); }
+.badge-updated {
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.8);
+  font-size: .7rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* === KPI ROW === */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  padding: 16px 0 4px;
+}
+.kpi {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+.kpi-label { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-muted); }
+.kpi-value { font-size: 1.75rem; font-weight: 700; line-height: 1.1; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.kpi-value.green { color: var(--green); }
+.kpi-value.amber { color: var(--amber); }
+.kpi-value.red { color: var(--red); }
+.kpi-value.purple { color: var(--purple); }
+.kpi-sub { font-size: .72rem; color: var(--fg-light); margin-top: 3px; }
+
+/* === SECTION TITLE === */
+.section-title {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--fg-muted);
+  margin: 20px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* === FERIADOS ALERT === */
+.feriados-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.feriado-chip {
+  background: var(--amber-light);
+  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent);
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+}
+
+/* === CARDS GRID === */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+/* === COLABORADOR CARD === */
+.colab-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+.colab-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+}
+.colab-card.status-ativo::before { background: var(--green); }
+.colab-card.status-folga::before { background: var(--accent); }
+.colab-card.status-inss::before { background: var(--purple); }
+.colab-card.status-aguardando::before { background: var(--fg-light); }
+.colab-card.status-alerta::before { background: var(--red); }
+
+.card-head {
+  padding: 12px 14px 10px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.card-name { font-size: .9rem; font-weight: 600; line-height: 1.3; }
+.card-role { font-size: .72rem; color: var(--fg-muted); margin-top: 1px; }
+.card-status {
+  flex-shrink: 0;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.status-bg-ativo { background: var(--green-light); color: var(--green); }
+.status-bg-folga { background: var(--accent-light); color: var(--accent); }
+.status-bg-inss { background: var(--purple-light); color: var(--purple); }
+.status-bg-aguardando { background: var(--border); color: var(--fg-muted); }
+.status-bg-alerta { background: var(--red-light); color: var(--red); }
+
+.card-body {
+  padding: 0 14px 12px 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.card-row { display: contents; }
+.card-field { }
+.cf-label { font-size: .66rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--fg-light); }
+.cf-value {
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.cf-value.span2 { grid-column: span 2; }
+
+/* saldo destaque */
+.saldo-block {
+  margin: 0 14px 12px 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.saldo-label { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--fg-muted); }
+.saldo-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.saldo-value.pos { color: var(--green); }
+.saldo-value.neg { color: var(--red); }
+.saldo-value.zero { color: var(--fg-muted); }
+.saldo-value.inss { color: var(--purple); }
+
+.card-obs {
+  margin: 0 14px 12px 18px;
+  font-size: .72rem;
+  color: var(--fg-muted);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  border-left: 3px solid var(--border);
+  font-style: italic;
+}
+
+/* progress bar */
+.progress-wrap {
+  margin: 0 14px 10px 18px;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: .68rem;
+  color: var(--fg-light);
+  margin-bottom: 4px;
+}
+.progress-bar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width .3s;
+}
+.fill-green { background: var(--green); }
+.fill-blue { background: var(--accent); }
+.fill-red { background: var(--red); }
+.fill-grey { background: var(--fg-light); }
+
+/* footer bar */
+.card-footer {
+  padding: 7px 14px 7px 18px;
+  border-top: 1px solid var(--border);
+  font-size: .68rem;
+  color: var(--fg-light);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.footer-item { display: flex; gap: 4px; }
+.footer-key { color: var(--fg-light); }
+.footer-val { color: var(--fg-muted); font-weight: 500; }
+
+/* === LEGENDA === */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .75rem;
+  color: var(--fg-muted);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* === REGRAS BOX === */
+.rules-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.rules-box h4 { margin: 0 0 8px; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-muted); }
+.rules-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.rules-list li {
+  font-size: .78rem;
+  color: var(--fg-muted);
+  padding-left: 16px;
+  position: relative;
+}
+.rules-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>📋 Escala Banco de Horas — Gelo Manaus</h1>
+      <p class="header-sub">Atualizado em 06/11/2026 · Período: out/2026 — dez/2026</p>
+    </div>
+    <span class="badge-updated">✓ Dados ao vivo · Supabase</span>
+  </div>
+</div>
+
+<div style="padding-top:4px">
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Em Folga Hoje</div>
+    <div class="kpi-value amber">3</div>
+    <div class="kpi-sub">Evandro · Sidney · Homero*</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Retornam Amanhã</div>
+    <div class="kpi-value green">2</div>
+    <div class="kpi-sub">Evandro (07/11) · Sidney (07/11)</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">INSS Ativo</div>
+    <div class="kpi-value purple">1</div>
+    <div class="kpi-sub">Homero → retorno 06/01/2027</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Próx. Início</div>
+    <div class="kpi-value accent" style="color:var(--accent)">2</div>
+    <div class="kpi-sub">Arildo · Jorge (07/11)</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Saldos Negativos</div>
+    <div class="kpi-value red">1</div>
+    <div class="kpi-sub">Sidney −022h21</div>
+  </div>
+</div>
+
+<!-- Feriados -->
+<div class="section-title">Feriados no Período</div>
+<div class="feriados-row">
+  <span class="feriado-chip">🏛 02/11 Finados (dom)</span>
+  <span class="feriado-chip">🇧🇷 15/11 Proclamação da República (dom)</span>
+  <span class="feriado-chip">✊ 20/11 Consciência Negra (sex)</span>
+  <span class="feriado-chip">🌟 08/12 Imaculada Conceição/AM (ter)</span>
+  <span class="feriado-chip">🎄 25/12 Natal (sex)</span>
+</div>
+
+<!-- Regras -->
+<div class="rules-box">
+  <h4>Regras de Cálculo</h4>
+  <ul class="rules-list">
+    <li>Jornada: 10h/dia | 1h12 almoço | <strong>8h48 (528 min)</strong> debitável por dia válido</li>
+    <li>Dias válidos: Seg – Sáb, exceto domingos (DSR), feriados e folga compensatória (1 dia/semana por colaborador)</li>
+    <li>INSS: período de afastamento <strong>não debita</strong> banco de horas — saldo congela</li>
+    <li>Folga compensatória por colaborador: varia (ver FC na escala); excluída do débito semanal</li>
+  </ul>
+</div>
+
+<!-- Legenda -->
+<div class="section-title">Legenda</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Em Folga</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Afastado INSS</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Ativo / Trabalho</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--fg-light)"></div>Aguardando Início</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Saldo Negativo</div>
+</div>
+
+<!-- Cards -->
+<div class="section-title">Colaboradores — Escala Completa</div>
+<div class="cards-grid">
+
+<!-- === EM FOLGA HOJE === -->
+
+<!-- 13 Evandro -->
+<div class="colab-card status-folga">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Evandro Silva da Silva</div>
+      <div class="card-role">A2 · Ajudante · Grupo 1</div>
+    </div>
+    <span class="card-status status-bg-folga">Em Folga</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">21/10/2026 (qua)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">06/11/2026 (sex) ← hoje</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">07/11/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Terça-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">15 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Dias Confirmados</div><div class="cf-value">14 dias úteis</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Confirmados: 14/15</span><span>93%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-blue" style="width:93%"></div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Banco de Horas</div>
+    <div class="saldo-value pos">+004h39</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">007671 min (127h51)</span></div>
+    <div class="footer-item"><span class="footer-key">Débito:</span><span class="footer-val">14 × 528 = 7392 min</span></div>
+  </div>
+</div>
+
+<!-- 1 Roldão -->
+<div class="colab-card status-folga">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Roldão Duarte</div>
+      <div class="card-role">M1 · Motorista · Grupo 1</div>
+    </div>
+    <span class="card-status status-bg-folga">Em Folga</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">21/10/2026 (qua)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">13/11/2026 (sex)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">14/11/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Quinta-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">21 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Dias Confirmados</div><div class="cf-value">14 dias úteis</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Em andamento...</span><span>~67%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-blue" style="width:67%"></div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Atual (parcial)</div>
+    <div class="saldo-value pos">+060h24</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">011016 min (183h36)</span></div>
+    <div class="footer-item"><span class="footer-key">Débito até agora:</span><span class="footer-val">14 × 528 = 7392 min</span></div>
+  </div>
+</div>
+
+<!-- 3 Maicon -->
+<div class="colab-card status-folga">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Maicon Alexandre Xavier da Silva</div>
+      <div class="card-role">M2 · Motorista · Grupo 1</div>
+    </div>
+    <span class="card-status status-bg-folga">Em Folga</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">22/10/2026 (qui)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">10/11/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">10/11/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Terça-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">17 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Dias Confirmados</div><div class="cf-value">13 dias úteis</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Em andamento...</span><span>~76%</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-blue" style="width:76%"></div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Atual (parcial)</div>
+    <div class="saldo-value pos">+037h19</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">009103 min (151h43)</span></div>
+    <div class="footer-item"><span class="footer-key">Débito:</span><span class="footer-val">13 × 528 = 6864 min</span></div>
+  </div>
+</div>
+
+<!-- 8 Sidney -->
+<div class="colab-card status-alerta">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Sidney Marans Oliveira</div>
+      <div class="card-role">A1 · Ajudante · Grupo 2</div>
+    </div>
+    <span class="card-status status-bg-alerta">Saldo Negativo</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">22/10/2026 (qui)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">06/11/2026 (sex) ← hoje</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">07/11/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Segunda-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">11 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Dias Confirmados</div><div class="cf-value">13 dias úteis</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Confirmados: 13/11</span><span>⚠ Excedeu previsão</span></div>
+    <div class="progress-bar"><div class="progress-fill fill-red" style="width:100%"></div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Final</div>
+    <div class="saldo-value neg">−022h21</div>
+  </div>
+  <div class="card-obs">Antecipado — substitui Arildo na Vaga A1. Déficit real de 1.341 min. Recupera no dia a dia.</div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">005523 min (92h03)</span></div>
+    <div class="footer-item"><span class="footer-key">Débito:</span><span class="footer-val">13 × 528 = 6864 min</span></div>
+  </div>
+</div>
+
+<!-- 5 Homero INSS -->
+<div class="colab-card status-inss">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Homero Gusmão Torres</div>
+      <div class="card-role">M2 · Motorista · Grupo 3</div>
+    </div>
+    <span class="card-status status-bg-inss">Afastado INSS</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Folga Banco (fim)</div><div class="cf-value">28/10 → 05/11/2026</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Segunda-feira</div></div>
+    <div class="card-field"><div class="cf-label">INSS Início</div><div class="cf-value">07/11/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">60 dias corridos</div><div class="cf-value">até 05/01/2027</div></div>
+    <div class="card-field"><div class="cf-label">Retorno ao Trabalho</div><div class="cf-value">06/01/2027 (qua)</div></div>
+    <div class="card-field"><div class="cf-label">Dias Folga Confirm.</div><div class="cf-value">7 dias úteis</div></div>
+    <div class="card-field cf-value span2" style="font-size:.74rem;color:var(--purple);font-weight:600;padding-top:2px">
+      ⚠ Banco congelado durante INSS — sem débito adicional
+    </div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Congelado (INSS)</div>
+    <div class="saldo-value inss">017h18</div>
+  </div>
+  <div class="card-obs">Período INSS: 07/11/2026 → 05/01/2027. Saldo de 1.038 min (17h18) congelado. Vaga M2 coberta por Javier a partir 10/11.</div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">004734 min (78h54)</span></div>
+    <div class="footer-item"><span class="footer-key">Folga banco:</span><span class="footer-val">7 × 528 = 3696 min</span></div>
+    <div class="footer-item"><span class="footer-key">INSS:</span><span class="footer-val">NÃO debita</span></div>
+  </div>
+</div>
+
+<!-- === PRÓXIMOS INÍCIOS === -->
+
+<!-- 7 Arildo -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Arildo da Cruz Pereira</div>
+      <div class="card-role">A1 · Ajudante · Grupo 1</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 07/11</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">07/11/2026 (sáb) ← amanhã</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">25/11/2026 (qua)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">26/11/2026 (qui)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Segunda-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">17 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Feriados no período</div><div class="cf-value">15/11 (dom), 20/11 (sex)</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">135h28</div>
+  </div>
+  <div class="card-obs">Reagendado — retorno 26/11. Feriado 20/11 (Consciência Negra) exclui débito naquele dia.</div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">008648 min (144h08)</span></div>
+    <div class="footer-item"><span class="footer-key">Prev. débito:</span><span class="footer-val">~12 dias úteis = 6336 min</span></div>
+  </div>
+</div>
+
+<!-- 14 Jorge Luna -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Jorge Agustin Luna Astudillo</div>
+      <div class="card-role">A2 · Ajudante · Grupo 2</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 07/11</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">07/11/2026 (sáb) ← amanhã</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">23/11/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">24/11/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Terça-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">14 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Evandro na Vaga A2</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">121h55</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">007321 min (122h01)</span></div>
+    <div class="footer-item"><span class="footer-key">Prev. débito:</span><span class="footer-val">~10 dias úteis = 5280 min</span></div>
+  </div>
+</div>
+
+<!-- 4 Javier -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Javier David Luna Astudillo</div>
+      <div class="card-role">M2 · Motorista · Grupo 2</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 10/11</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">10/11/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">26/11/2026 (qui)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">27/11/2026 (sex)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Quinta-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">15 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Maicon na Vaga M2 (c/ Homero INSS)</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">132h11</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">007931 min (132h11)</span></div>
+    <div class="footer-item"><span class="footer-key">Feriado:</span><span class="footer-val">20/11 Consciência Negra</span></div>
+  </div>
+</div>
+
+<!-- 2 Jean Carlos Pinto -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Jean Carlos dos Santos Pinto</div>
+      <div class="card-role">M1 · Motorista · Grupo 2</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 14/11</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">14/11/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">01/12/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">02/12/2026 (qua)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Sábado</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">15 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Roldão na Vaga M1</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">130h50</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">007850 min (130h50)</span></div>
+    <div class="footer-item"><span class="footer-key">Feriados:</span><span class="footer-val">15/11 (dom), 20/11 (sex)</span></div>
+  </div>
+</div>
+
+<!-- === DEZEMBRO === -->
+
+<!-- 9 Francisco F. -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Francisco Ferreira dos Santos</div>
+      <div class="card-role">A1 · Ajudante · Grupo 3</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 23/11</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">23/11/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">30/11/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">01/12/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Sábado</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">7 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Sidney na Vaga A1</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">061h04</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">003664 min (61h04)</span></div>
+    <div class="footer-item"><span class="footer-key">Prev. débito:</span><span class="footer-val">~5 dias úteis = 2640 min</span></div>
+  </div>
+</div>
+
+<!-- 15 Jean Nunes -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Jean Carlos Nunes Vieira</div>
+      <div class="card-role">A2 · Ajudante · Grupo 3</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 24/11</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">24/11/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">04/12/2026 (sex)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">05/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Sábado</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">10 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Jorge na Vaga A2</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">084h45</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">005085 min (84h45)</span></div>
+    <div class="footer-item"><span class="footer-key">Feriado:</span><span class="footer-val">08/12 Imaculada/AM (ter)</span></div>
+  </div>
+</div>
+
+<!-- 5 Homero (posição na escala futura — Javier concluiu) -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Homero Gusmão Torres</div>
+      <div class="card-role">M2 · Motorista · Grupo 3 · (pós-INSS)</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 27/11*</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Folga banco início</div><div class="cf-value">27/11/2026 (sex)*</div></div>
+    <div class="card-field"><div class="cf-label">Folga banco último</div><div class="cf-value">07/12/2026 (seg)*</div></div>
+    <div class="card-field"><div class="cf-label">INSS até</div><div class="cf-value">05/01/2027 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno efetivo</div><div class="cf-value">06/01/2027 (qua)</div></div>
+    <div class="card-field cf-value span2" style="font-size:.73rem;color:var(--purple);font-weight:600">
+      ⚠ Escala posição futura. Afastamento INSS prevalece sobre a folga banco.
+    </div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Congelado (INSS)</div>
+    <div class="saldo-value inss">017h18</div>
+  </div>
+  <div class="card-obs">Folga banco normal programada para 27/11, mas o afastamento INSS iniciado em 07/11 se estende até 05/01/2027. O sistema não debita BH durante o INSS.</div>
+</div>
+
+<!-- 10 Eldeson -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Eldeson Lopes Fernandes</div>
+      <div class="card-role">A1 · Ajudante · Grupo 4</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 01/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">01/12/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">04/12/2026 (sex)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">05/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Sábado</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">4 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Francisco F. na Vaga A1</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">031h02</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">001862 min (31h02)</span></div>
+    <div class="footer-item"><span class="footer-key">Prev. débito:</span><span class="footer-val">~3 dias úteis = 1584 min</span></div>
+  </div>
+</div>
+
+<!-- 11 Marcos dos Santos -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Marcos Roberto dos Santos</div>
+      <div class="card-role">A1 · Ajudante · Folga 1 dia</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 05/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">05/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">05/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">07/12/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">1 dia</div></div>
+    <div class="card-field"><div class="cf-label">Saldo Orig.</div><div class="cf-value">514 min (8h34)</div></div>
+    <div class="card-field"><div class="cf-label">Folga Comp.</div><div class="cf-value">Quinta-feira</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo após 1 dia</div>
+    <div class="saldo-value pos">−000h14</div>
+  </div>
+  <div class="card-obs">Folga de 1 dia. Saldo de 514 min − 528 min = −14 min (margem mínima aceitável).</div>
+</div>
+
+<!-- 16 Rickson -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Rickson Pantoja Reis</div>
+      <div class="card-role">A2 · Ajudante · Grupo 4</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 05/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">05/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">09/12/2026 (qua)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">10/12/2026 (qui)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Segunda-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">4 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Jean Nunes na Vaga A2</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">032h39</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">001959 min (32h39)</span></div>
+    <div class="footer-item"><span class="footer-key">Feriado:</span><span class="footer-val">08/12 Imaculada/AM — exclui débito</span></div>
+  </div>
+</div>
+
+<!-- 12 Pedro Elias -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Pedro Elias Canizo Torres</div>
+      <div class="card-role">A1 · Ajudante · Folga 1 dia</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 07/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">07/12/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">07/12/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">08/12/2026 (ter) — feriado</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">1 dia</div></div>
+    <div class="card-field"><div class="cf-label">Saldo Orig.</div><div class="cf-value">310 min (5h10)</div></div>
+    <div class="card-field"><div class="cf-label">Folga Comp.</div><div class="cf-value">Quinta-feira</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo após 1 dia</div>
+    <div class="saldo-value neg">−003h38</div>
+  </div>
+  <div class="card-obs">⚠ Saldo insuficiente: 310 min − 528 min = −218 min (−3h38). Precisa de atenção antes do início.</div>
+</div>
+
+<!-- 6 Frankney -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Frankney Pinto Pereira</div>
+      <div class="card-role">M2 · Motorista · Grupo 3</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 08/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">08/12/2026 (ter) — feriado!</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">14/12/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">15/12/2026 (ter)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Sábado</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">6 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Feriado no período</div><div class="cf-value">08/12 (início = feriado AM)</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo Disponível</div>
+    <div class="saldo-value pos">051h30</div>
+  </div>
+  <div class="card-obs">Início cai em feriado (Imaculada Conceição/AM, 08/12). Dia corrido mas não debita banco de horas. Finaliza cota dos motoristas.</div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">003090 min (51h30)</span></div>
+    <div class="footer-item"><span class="footer-key">Prev. débito útil:</span><span class="footer-val">~4 dias = 2112 min</span></div>
+  </div>
+</div>
+
+<!-- 17 Francisco Assis -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Francisco de Assis Tavares de Souza</div>
+      <div class="card-role">A2 · Ajudante</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 10/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">10/12/2026 (qui)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">11/12/2026 (sex)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">12/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Quinta-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">2 dias corridos</div></div>
+    <div class="card-field"><div class="cf-label">Substitui</div><div class="cf-value">Rickson na Vaga A2</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo após 2 dias</div>
+    <div class="saldo-value pos">017h06</div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">001026 min (17h06)</span></div>
+    <div class="footer-item"><span class="footer-key">Prev. débito:</span><span class="footer-val">1 dia útil = 528 min (qui=FC)</span></div>
+  </div>
+</div>
+
+<!-- 18 Luis Marcio -->
+<div class="colab-card status-aguardando">
+  <div class="card-head">
+    <div>
+      <div class="card-name">Luis Marcio Ribeiro da Silva</div>
+      <div class="card-role">A2 · Ajudante</div>
+    </div>
+    <span class="card-status status-bg-aguardando">Inicia 12/12</span>
+  </div>
+  <div class="card-body">
+    <div class="card-field"><div class="cf-label">Início Folga</div><div class="cf-value">12/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">Último Dia</div><div class="cf-value">12/12/2026 (sáb)</div></div>
+    <div class="card-field"><div class="cf-label">Retorno</div><div class="cf-value">14/12/2026 (seg)</div></div>
+    <div class="card-field"><div class="cf-label">FC (Folga Comp.)</div><div class="cf-value">Segunda-feira</div></div>
+    <div class="card-field"><div class="cf-label">Dias Previstos</div><div class="cf-value">1 dia</div></div>
+    <div class="card-field"><div class="cf-label">Função na escala</div><div class="cf-value">Finaliza cota dos ajudantes</div></div>
+  </div>
+  <div class="saldo-block">
+    <div class="saldo-label">Saldo após 1 dia (sáb)</div>
+    <div class="saldo-value neg">−004h02</div>
+  </div>
+  <div class="card-obs">⚠ Saldo insuficiente: 286 min − 528 min = −242 min (−4h02). Precisa de atenção antes do início.</div>
+  <div class="card-footer">
+    <div class="footer-item"><span class="footer-key">Orig:</span><span class="footer-val">000286 min (4h46)</span></div>
+    <div class="footer-item"><span class="footer-key">Finaliza:</span><span class="footer-val">Cota ajudantes</span></div>
+  </div>
+</div>
+
+</div><!-- fim cards-grid -->
+
+<!-- Alertas -->
+<div class="section-title">⚠ Atenção — Saldos Insuficientes</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:24px">
+
+  <div style="background:var(--red-light);border:1px solid color-mix(in srgb,var(--red) 25%,transparent);border-radius:var(--radius);padding:12px 14px">
+    <div style="font-weight:700;color:var(--red);font-size:.82rem">Sidney Marans Oliveira — CONCLUÍDO</div>
+    <div style="font-size:.75rem;color:var(--fg-muted);margin-top:4px">Déficit real de −1.341 min (−22h21). Folga encerrada amanhã (07/11). Recupera saldo no dia a dia trabalhado.</div>
+  </div>
+
+  <div style="background:var(--amber-light);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:var(--radius);padding:12px 14px">
+    <div style="font-weight:700;color:var(--amber);font-size:.82rem">Pedro Elias — Inicia 07/12</div>
+    <div style="font-size:.75rem;color:var(--fg-muted);margin-top:4px">Saldo 310 min. Necessário 528 min. Déficit previsto: −218 min (−3h38). Precisa de ação antes do início.</div>
+  </div>
+
+  <div style="background:var(--amber-light);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:var(--radius);padding:12px 14px">
+    <div style="font-weight:700;color:var(--amber);font-size:.82rem">Luis Marcio — Inicia 12/12</div>
+    <div style="font-size:.75rem;color:var(--fg-muted);margin-top:4px">Saldo 286 min. Necessário 528 min. Déficit previsto: −242 min (−4h02). Precisa de ação antes do início.</div>
+  </div>
+
+  <div style="background:var(--amber-light);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:var(--radius);padding:12px 14px">
+    <div style="font-weight:700;color:var(--amber);font-size:.82rem">Marcos dos Santos — Inicia 05/12</div>
+    <div style="font-size:.75rem;color:var(--fg-muted);margin-top:4px">Saldo 514 min vs 528 min. Déficit de apenas −14 min. Margem mínima aceitável.</div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:16px 0 24px;font-size:.72rem;color:var(--fg-light)">
+  Escala Banco de Horas · Gelo Manaus · Gerado 06/11/2026 · Dados: Supabase GeloManausDB
+</div>
+
+</div><!-- fim padding -->
+
+</body>
+</html>
