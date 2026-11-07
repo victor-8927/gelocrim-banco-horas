@@ -198,10 +198,51 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);min-hei
 /* FOOTER */
 .site-footer{text-align:center;padding:16px 0 32px;font-size:.72rem;color:var(--fg-light)}
 
+/* GERENCIAL */
+.gerencial-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:28px}
+.ger-totais{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border-bottom:1px solid var(--border)}
+.ger-total-card{padding:18px 20px;border-right:1px solid var(--border)}
+.ger-total-card:last-child{border-right:none}
+.ger-total-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--fg-muted);margin-bottom:6px}
+.ger-total-value{font-size:1.6rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.ger-total-sub{font-size:.68rem;color:var(--fg-light);margin-top:4px}
+.ger-barra-global{padding:16px 20px;border-bottom:1px solid var(--border)}
+.ger-barra-labels{display:flex;justify-content:space-between;font-size:.74rem;margin-bottom:8px}
+.ger-barra-track{height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.ger-barra-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#16a34a);border-radius:5px;transition:width .6s ease}
+.ger-grid{padding:8px 0}
+.ger-row{display:grid;grid-template-columns:140px 1fr 120px 36px 90px;align-items:center;gap:10px;padding:8px 20px;border-bottom:1px solid var(--border)}
+.ger-row:last-child{border-bottom:none}
+.ger-row:hover{background:var(--bg-section)}
+.ger-nome{font-size:.78rem;font-weight:700;color:var(--fg);display:flex;align-items:center;gap:5px}
+.ger-func{font-size:.6rem;background:var(--border);color:var(--fg-muted);border-radius:4px;padding:1px 5px;font-weight:700}
+.ger-nums{display:flex;gap:8px;font-size:.68rem;font-family:'JetBrains Mono',monospace}
+.ger-ini{color:var(--fg-muted)}
+.ger-liq{color:var(--accent);font-weight:700}
+.ger-res{color:var(--green);font-weight:700}
+.ger-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.ger-bar-fill{height:100%;border-radius:3px}
+.ger-pct{font-size:.72rem;font-weight:800;text-align:right;font-family:'JetBrains Mono',monospace}
+.ger-pct.grn{color:var(--green)}
+.ger-status-chip{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:20px;text-align:center;white-space:nowrap}
+.chip-ok{background:var(--green-light);color:var(--green)}
+.chip-alerta{background:var(--amber-light);color:var(--amber)}
+.chip-risco{background:var(--red-light);color:var(--red)}
+.chip-inss{background:var(--purple-light);color:var(--purple)}
+.chip-split{background:var(--orange-light);color:var(--orange)}
+.chip-jan{background:var(--accent-light);color:var(--accent)}
+.ger-alerta-box{background:color-mix(in srgb,var(--amber) 8%,var(--bg-card));border-top:1px solid color-mix(in srgb,var(--amber) 25%,transparent);padding:14px 20px}
+.ger-alerta-title{font-size:.78rem;font-weight:700;color:var(--amber);margin-bottom:4px}
+.ger-alerta-body{font-size:.74rem;color:var(--fg-muted);line-height:1.6}
+
 @media(max-width:600px){
   .header-inner{padding:20px 16px}
   .kpi-bar{grid-template-columns:repeat(2,1fr)}
   .cards-grid{grid-template-columns:1fr}
+  .ger-row{grid-template-columns:1fr 1fr;gap:6px}
+  .ger-bar-wrap,.ger-pct,.ger-status-chip{display:none}
+  .ger-totais{grid-template-columns:repeat(2,1fr)}
+  .ger-total-card{border-right:none;border-bottom:1px solid var(--border)}
 }
 </style>
 </head>
@@ -227,6 +268,322 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);min-hei
 </header>
 
 <div class="main">
+
+<!-- PAINEL GERENCIAL -->
+<div class="section-title">📊 Liquidação Global do Banco de Horas</div>
+<div class="gerencial-wrap">
+
+  <!-- TOTAIS GLOBAIS -->
+  <div class="ger-totais">
+    <div class="ger-total-card">
+      <div class="ger-total-label">Saldo Total Inicial</div>
+      <div class="ger-total-value" style="color:var(--fg)">1.166h 51min</div>
+      <div class="ger-total-sub">70.011 min · 18 colaboradores</div>
+    </div>
+    <div class="ger-total-card">
+      <div class="ger-total-label">A Liquidar (programado)</div>
+      <div class="ger-total-value" style="color:var(--accent)">977h 12min</div>
+      <div class="ger-total-sub">111 dias × 528 min = 58.608 min</div>
+    </div>
+    <div class="ger-total-card">
+      <div class="ger-total-label">Saldo Residual (após folgas)</div>
+      <div class="ger-total-value" style="color:var(--green)">189h 39min</div>
+      <div class="ger-total-sub">11.403 min restantes após liquidação</div>
+    </div>
+    <div class="ger-total-card">
+      <div class="ger-total-label">% Liquidado</div>
+      <div class="ger-total-value" style="color:var(--amber)">83,7%</div>
+      <div class="ger-total-sub">do total do banco será zerado até 15/12</div>
+    </div>
+  </div>
+
+  <!-- BARRA GLOBAL -->
+  <div class="ger-barra-global">
+    <div class="ger-barra-labels">
+      <span style="color:var(--accent);font-weight:700">977h liquidadas</span>
+      <span style="color:var(--fg-muted)">de 1.166h totais</span>
+      <span style="color:var(--green);font-weight:700">83,7%</span>
+    </div>
+    <div class="ger-barra-track">
+      <div class="ger-barra-fill" style="width:83.7%"></div>
+    </div>
+    <div class="ger-barra-labels" style="margin-top:6px;font-size:.7rem">
+      <span style="color:var(--fg-light)">Prazo: 15/12/2026 · Pausa geral: 16/12 → 03/01/2027</span>
+      <span style="color:var(--amber)">189h residuais continuam em Jan/27</span>
+    </div>
+  </div>
+
+  <!-- GRID POR COLABORADOR -->
+  <div class="ger-grid">
+
+    <!-- Roldão -->
+    <div class="ger-row">
+      <div class="ger-nome">Roldão<span class="ger-func">M</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">78h00</span>
+        <span class="ger-liq">70h24</span>
+        <span class="ger-res">+07h36</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:90.3%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">90%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Jean Carlos Pinto -->
+    <div class="ger-row">
+      <div class="ger-nome">Jean C. Pinto<span class="ger-func">M</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">130h50</span>
+        <span class="ger-liq">123h12</span>
+        <span class="ger-res">+07h38</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:94.2%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">94%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Maicon -->
+    <div class="ger-row">
+      <div class="ger-nome">Maicon<span class="ger-func">M</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">73h17</span>
+        <span class="ger-liq">70h24</span>
+        <span class="ger-res">+02h53</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:96.1%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">96%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Javier -->
+    <div class="ger-row">
+      <div class="ger-nome">Javier<span class="ger-func">M</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">129h28</span>
+        <span class="ger-liq">123h12</span>
+        <span class="ger-res">+06h16</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:95.2%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">95%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Homero -->
+    <div class="ger-row">
+      <div class="ger-nome">Homero<span class="ger-func">M</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">78h54</span>
+        <span class="ger-liq">70h24</span>
+        <span class="ger-res">+08h30</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:89.2%;background:var(--purple)"></div>
+      </div>
+      <div class="ger-pct" style="color:var(--purple)">89%</div>
+      <div class="ger-status-chip chip-inss">INSS</div>
+    </div>
+
+    <!-- Frankney -->
+    <div class="ger-row">
+      <div class="ger-nome">Frankney<span class="ger-func">M</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">63h01</span>
+        <span class="ger-liq">61h36</span>
+        <span class="ger-res">+01h25</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:97.7%;background:var(--orange)"></div>
+      </div>
+      <div class="ger-pct" style="color:var(--orange)">98%</div>
+      <div class="ger-status-chip chip-split">Split</div>
+    </div>
+
+    <!-- Arildo -->
+    <div class="ger-row">
+      <div class="ger-nome">Arildo<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">149h06</span>
+        <span class="ger-liq">140h48</span>
+        <span class="ger-res">+08h18</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:94.4%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">94%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Sidney -->
+    <div class="ger-row">
+      <div class="ger-nome">Sidney<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">05h56</span>
+        <span class="ger-liq">00h00</span>
+        <span class="ger-res">+05h56</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:0%;background:var(--amber)"></div>
+      </div>
+      <div class="ger-pct" style="color:var(--amber)">0%</div>
+      <div class="ger-status-chip chip-alerta">⚠ Sem saldo</div>
+    </div>
+
+    <!-- Francisco F. -->
+    <div class="ger-row">
+      <div class="ger-nome">Francisco F.<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">85h47</span>
+        <span class="ger-liq">79h12</span>
+        <span class="ger-res">+06h35</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:92.3%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">92%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Eldeson -->
+    <div class="ger-row">
+      <div class="ger-nome">Eldeson<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">48h00</span>
+        <span class="ger-liq">44h00</span>
+        <span class="ger-res">+04h00</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:91.7%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">92%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Pedro -->
+    <div class="ger-row">
+      <div class="ger-nome">Pedro<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">05h10</span>
+        <span class="ger-liq">08h48</span>
+        <span class="ger-res">-03h38</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:100%;background:var(--red)"></div>
+      </div>
+      <div class="ger-pct" style="color:var(--red)">!</div>
+      <div class="ger-status-chip chip-risco">⚠ Rever</div>
+    </div>
+
+    <!-- Evandro -->
+    <div class="ger-row">
+      <div class="ger-nome">Evandro<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">39h51</span>
+        <span class="ger-liq">35h12</span>
+        <span class="ger-res">+04h39</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:88.4%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">88%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Jorge -->
+    <div class="ger-row">
+      <div class="ger-nome">Jorge<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">122h01</span>
+        <span class="ger-liq">114h24</span>
+        <span class="ger-res">+07h37</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:93.8%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">94%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Jean Nunes -->
+    <div class="ger-row">
+      <div class="ger-nome">Jean Nunes<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">84h37</span>
+        <span class="ger-liq">70h24</span>
+        <span class="ger-res">+14h13</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:83.2%;background:var(--amber)"></div>
+      </div>
+      <div class="ger-pct" style="color:var(--amber)">83%</div>
+      <div class="ger-status-chip chip-jan">+1d Jan/27</div>
+    </div>
+
+    <!-- Rickson -->
+    <div class="ger-row">
+      <div class="ger-nome">Rickson<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">24h55</span>
+        <span class="ger-liq">17h36</span>
+        <span class="ger-res">+07h19</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:70.7%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">71%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Francisco Assis -->
+    <div class="ger-row">
+      <div class="ger-nome">Fco. Assis<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">27h33</span>
+        <span class="ger-liq">26h24</span>
+        <span class="ger-res">+01h09</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:95.8%;background:var(--green)"></div>
+      </div>
+      <div class="ger-pct grn">96%</div>
+      <div class="ger-status-chip chip-ok">✓ No prazo</div>
+    </div>
+
+    <!-- Luis Marcio -->
+    <div class="ger-row">
+      <div class="ger-nome">Luis Marcio<span class="ger-func">A</span></div>
+      <div class="ger-nums">
+        <span class="ger-ini">06h51</span>
+        <span class="ger-liq">08h48</span>
+        <span class="ger-res">-01h57</span>
+      </div>
+      <div class="ger-bar-wrap">
+        <div class="ger-bar-fill" style="width:100%;background:var(--amber)"></div>
+      </div>
+      <div class="ger-pct" style="color:var(--amber)">!</div>
+      <div class="ger-status-chip chip-alerta">⚠ Sem saldo</div>
+    </div>
+
+  </div><!-- fim ger-grid -->
+
+  <!-- ALERTA ACÚMULO -->
+  <div class="ger-alerta-box">
+    <div class="ger-alerta-title">⚠ Alerta: Acúmulo de Horas Após 07/11</div>
+    <div class="ger-alerta-body">
+      Restam <strong>38 dias úteis</strong> até 15/12/2026. Cada dia extra acumulado agora <strong>não poderá ser liquidado</strong> antes da pausa geral.
+      Colaboradores com saldo insuficiente (Sidney, Luis Marcio, Pedro) já estão no limite —
+      qualquer nova hora acumulada <strong>vai para 2027</strong>.
+    </div>
+  </div>
+
+</div><!-- fim gerencial-wrap -->
 
 <!-- KPI BAR -->
 <div class="kpi-bar">
