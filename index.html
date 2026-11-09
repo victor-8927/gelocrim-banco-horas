@@ -303,9 +303,14 @@ body {
 .dt-val.green   { color: var(--green); }
 .dt-val.purple  { color: var(--purple); }
 
-.dias-row { display: flex; align-items: center; gap: 6px; }
+.dias-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .dias-label { font-size: 10px; color: var(--fg-light); text-transform: uppercase; letter-spacing: .4px; }
 .dias-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+
+.bh-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.bh3-item { display: flex; flex-direction: column; gap: 2px; }
+.bh3-label { font-size: 9px; color: var(--fg-light); text-transform: uppercase; letter-spacing: .4px; }
+.bh3-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 .card-obs {
   font-size: 11px; color: var(--fg-muted); line-height: 1.4;
@@ -382,6 +387,43 @@ function minToBh(min) {
   return `${h}:${String(m).padStart(2,'0')}`;
 }
 function getDias(bh) { return Math.floor(bhToMin(bh) / 528); }
+
+// Feriados do ciclo (YYYY-MM-DD)
+const FERIADOS = new Set(['2026-11-02','2026-11-20','2026-12-08','2026-12-25']);
+
+const FC_MAP = { 'seg':1, 'ter':2, 'qua':3, 'qui':4, 'sex':5, 'sab':6, 'dom':0 };
+
+function isBhDay(date, fcDow) {
+  const dow = date.getDay();
+  if (dow === 0) return false; // domingo DSR
+  if (fcDow !== null && dow === fcDow) return false; // FC
+  const key = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  if (FERIADOS.has(key)) return false;
+  return true;
+}
+
+function calcBhProgress(item) {
+  const ini = parseDate(item.dt_inicio);
+  const ult = parseDate(item.dt_ultimo);
+  if (!ini || !ult) return { consumido: 0, restante: bhToMin(item.horas_banco), totalDias: getDias(item.horas_banco), diasFeitos: 0 };
+
+  const fcDow = item.fc_dia_semana ? (FC_MAP[item.fc_dia_semana] ?? null) : null;
+  const totalMin = bhToMin(item.horas_banco);
+  const totalDias = getDias(item.horas_banco);
+
+  // Conta dias BH já feitos (de ini até min(hoje-1, ult))
+  const limite = new Date(Math.min(TODAY.getTime() - 1, ult.getTime()));
+  let diasFeitos = 0;
+  const cur = new Date(ini);
+  while (cur <= limite) {
+    if (isBhDay(cur, fcDow)) diasFeitos++;
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const consumido = diasFeitos * 528;
+  const restante  = Math.max(0, totalMin - consumido);
+  return { consumido, restante, totalDias, diasFeitos };
+}
 
 function getStatus(item) {
   const ini = parseDate(item.dt_inicio);
@@ -524,11 +566,37 @@ function renderApp(data) {
 
     const cardsHTML = items.map(item => {
       const st = getStatus(item);
-      const dias = getDias(item.horas_banco);
-      const progPct = Math.min(100, bhToMin(item.horas_banco) / (180*60) * 100);
+      const { consumido, restante, totalDias, diasFeitos } = calcBhProgress(item);
+      const totalMin = bhToMin(item.horas_banco);
+      const progPct = totalMin > 0 ? Math.min(100, consumido / totalMin * 100) : 0;
       const progCol = st === 'atestado' ? 'var(--purple)' : st === 'retornou' ? 'var(--fg-light)' : col;
       const stLabel = { ativo:'EM FOLGA', futuro:'AGUARDANDO', retornou:'RETORNOU', atestado:'ATESTADO' }[st];
       const retClass = st === 'ativo' ? 'green' : st === 'atestado' ? 'purple' : 'accent';
+      const diasRestantes = totalDias - diasFeitos;
+
+      const bhProgressHTML = st === 'futuro' ? `
+          <div class="bh-row">
+            <span class="bh-label">Saldo Inicial</span>
+            <span class="bh-val" style="color:${col}">${item.horas_banco || '—'}</span>
+          </div>
+          <div class="prog-bg"><div class="prog-fill" style="width:0%;background:${col}"></div></div>` : `
+          <div class="bh-3col">
+            <div class="bh3-item">
+              <span class="bh3-label">Saldo Inicial</span>
+              <span class="bh3-val" style="color:var(--fg-muted)">${item.horas_banco || '—'}</span>
+            </div>
+            <div class="bh3-item">
+              <span class="bh3-label">Consumido</span>
+              <span class="bh3-val" style="color:${progCol}">${minToBh(consumido)}</span>
+            </div>
+            <div class="bh3-item">
+              <span class="bh3-label">Restante</span>
+              <span class="bh3-val" style="color:${st==='retornou'?'var(--fg-light)':col}">${minToBh(restante)}</span>
+            </div>
+          </div>
+          <div class="prog-bg" title="${diasFeitos}d feitos de ${totalDias}d">
+            <div class="prog-fill" style="width:${progPct}%;background:${progCol}"></div>
+          </div>`;
 
       return `
         <div class="card ${st}">
@@ -537,11 +605,7 @@ function renderApp(data) {
             <div class="card-nome">${item.nome}</div>
             <span class="badge badge-${st}">${stLabel}</span>
           </div>
-          <div class="bh-row">
-            <span class="bh-label">Banco de Horas</span>
-            <span class="bh-val" style="color:${col}">${item.horas_banco || '—'}</span>
-          </div>
-          <div class="prog-bg"><div class="prog-fill" style="width:${progPct}%;background:${progCol}"></div></div>
+          ${bhProgressHTML}
           <div class="datas">
             <div class="dt-item">
               <span class="dt-label">Início</span>
@@ -557,8 +621,10 @@ function renderApp(data) {
             </div>
           </div>
           <div class="dias-row">
-            <span class="dias-label">Dias BH</span>
-            <span class="dias-val" style="color:${col}">${dias}d</span>
+            <span class="dias-label">Dias feitos</span>
+            <span class="dias-val" style="color:${progCol}">${diasFeitos}d</span>
+            <span class="dias-label" style="margin-left:8px">Restam</span>
+            <span class="dias-val" style="color:${st==='retornou'?'var(--fg-light)':col}">${diasRestantes}d</span>
           </div>
           ${item.obs ? `<div class="card-obs">${item.obs}</div>` : ''}
         </div>`;
