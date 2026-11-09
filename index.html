@@ -412,7 +412,7 @@ function calcBhProgress(item) {
   const totalDias = getDias(item.horas_banco);
 
   // Conta dias BH já feitos (de ini até min(hoje-1, ult))
-  const limite = new Date(Math.min(TODAY.getTime() - 1, ult.getTime()));
+  const limite = new Date(Math.min(TODAY.getTime(), ult.getTime()));
   let diasFeitos = 0;
   const cur = new Date(ini);
   while (cur <= limite) {
